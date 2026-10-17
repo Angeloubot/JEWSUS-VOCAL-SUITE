@@ -12,14 +12,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install CMake
-        uses: lukka/get-cmake@latest
-
       - name: Download JUCE
         run: git clone --depth 1 --branch 8.0.8 https://github.com/juce-framework/JUCE.git JUCE
 
-      - name: Check build environment
-        run: |
-          cmake --version
-          git --version
-          dir
+      - name: Configure plugin
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile VST3
+        run: cmake --build build --config Release --target KiidAngelVocalSuite_VST3 --parallel 2
+
+      - name: Upload VST3 plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kiid-Angel-Vocal-Suite-VST3
+          path: build/KiidAngelVocalSuite_artefacts/Release/VST3/
+          if-no-files-found: error
